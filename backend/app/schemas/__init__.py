@@ -1,0 +1,1 @@
+from app.schemas.person_photo import PersonPhotoResponse

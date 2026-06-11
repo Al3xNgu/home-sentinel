@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from sqlalchemy import DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 
@@ -13,3 +13,8 @@ class Person(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
+    photos = relationship(
+        "PersonPhoto",
+        back_populates="person",
+        cascade="all, delete-orphan"
+    )   
