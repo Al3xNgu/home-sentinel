@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 import shutil
+from uuid import uuid4
 from pathlib import Path
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -93,9 +94,17 @@ def upload_person_photo(
             detail="Person not found"
         )
     
+    if file.content_type not in ["image/jpeg", "image/png"]:
+        raise HTTPException(
+            status_code=400,
+            detail="Only JPEG and PNG images are allowed"
+        )
+
     upload_dir = Path("uploads") / "people" / str(person_id)
     upload_dir.mkdir(parents=True, exist_ok=True)
-    file_path = upload_dir / file.filename
+    file_extension = Path(file.filename).suffix.lower()
+    unique_filename = f"{uuid4()}{file_extension}"
+    file_path = upload_dir / unique_filename
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
