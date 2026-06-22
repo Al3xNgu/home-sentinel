@@ -8,6 +8,7 @@ from app.models.person import Person
 from app.schemas.person import PersonCreate, PersonResponse, PersonUpdate
 from app.models.person_photo import PersonPhoto
 from app.schemas.person_photo import PersonPhotoResponse
+from app.services.face_service import validate_single_face
 
 router = APIRouter()
 
@@ -108,6 +109,16 @@ def upload_person_photo(
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+
+    is_valid, error_message = validate_single_face(str(file_path))
+
+    if not is_valid:
+        file_path.unlink()
+
+        raise HTTPException(
+            status_code=400,
+            detail=error_message
+        )
 
     photo = PersonPhoto(
         person_id=person_id,
