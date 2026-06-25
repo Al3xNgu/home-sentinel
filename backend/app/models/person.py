@@ -5,6 +5,9 @@ from app.database import Base
 
 
 class Person(Base):
+    """
+    Stores known individuals that Home Sentinel can recognize
+    """
     __tablename__ = "people"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -13,8 +16,17 @@ class Person(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
+    
+    # Deleting a person should remove all associated training photos
     photos = relationship(
         "PersonPhoto",
         back_populates="person",
         cascade="all, delete-orphan"
-    )   
+    )
+
+    # Deleting a person should remove all associated embeddings
+    embeddings = relationship(
+        "FaceEmbedding",
+        back_populates="person",
+        cascade="all, delete-orphan"
+    )

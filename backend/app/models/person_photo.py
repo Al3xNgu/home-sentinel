@@ -5,6 +5,9 @@ from app.database import Base
 
 
 class PersonPhoto(Base):
+    """
+    Stores uploaded training images for a known person
+    """
     __tablename__ = "person_photos"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -20,4 +23,10 @@ class PersonPhoto(Base):
     person = relationship(
         "Person",
         back_populates="photos"
+    )
+    
+    # A photo may have multiple embeddings
+    embeddings = relationship(
+        "FaceEmbedding",
+        back_populates="photo",
     )
